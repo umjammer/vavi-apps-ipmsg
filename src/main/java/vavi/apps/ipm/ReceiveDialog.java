@@ -50,7 +50,7 @@ public class ReceiveDialog extends JDialog {
 
     private JCheckBox quote;
 
-    /** İ’èƒtƒ@ƒCƒ‹ */
+    /** è¨­å®šãƒ•ã‚¡ã‚¤ãƒ« */
     private static Preferences userPrefs = Preferences.userNodeForPackage(Ipmessenger.class);
 
     /** */

@@ -63,23 +63,23 @@ public class MainWindow extends JFrame {
 
     private JButton exit;
 
-    private JList memberlist;
+    private JList<String> memberlist;
 
     private JCheckBox absence;
 
     private JCheckBox broadcast;
 
-    private JComboBox groups;
+    private JComboBox<String> groups;
 
-    private Map<String, CommunicationEvent> NAMEtoINFO = new HashMap<String, CommunicationEvent>();
+    private Map<String, CommunicationEvent> NAMEtoINFO = new HashMap<>();
 
-    private Map<String, CommunicationEvent> ADDRtoINFO = new HashMap<String, CommunicationEvent>();
+    private Map<String, CommunicationEvent> ADDRtoINFO = new HashMap<>();
 
     private boolean refreshing = false;
 
     private boolean received = false;
 
-    /** ê›íËÉtÉ@ÉCÉã */
+    /** Ë®≠ÂÆö„Éï„Ç°„Ç§„É´ */
     private static Preferences userPrefs = Preferences.userNodeForPackage(Ipmessenger.class);
 
     /** */
@@ -175,7 +175,7 @@ public class MainWindow extends JFrame {
             }
         });
         p6.add(sorthost);
-        memberlist = new JList();
+        memberlist = new JList<>();
         memberlist.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent event) {
                 sendAction();
@@ -195,7 +195,7 @@ public class MainWindow extends JFrame {
             }
         });
         p3.add(broadcast);
-        groups = new JComboBox();
+        groups = new JComboBox<>();
         groups.addItem(rb.getString("allName"));
         groups.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent ie) {
@@ -229,6 +229,7 @@ public class MainWindow extends JFrame {
     }
 
     /** */
+    @SuppressWarnings("unused")
     private Comparator<CommunicationEvent> comparator = new Comparator<CommunicationEvent>() {
         /** */
         private String getKey(CommunicationEvent ipmce) {
@@ -332,16 +333,16 @@ public class MainWindow extends JFrame {
                     sleep(500);
                 } catch (InterruptedException ex) {
                 }
-                NAMEtoINFO = new HashMap<String, CommunicationEvent>();
-                ADDRtoINFO = new HashMap<String, CommunicationEvent>();
+                NAMEtoINFO = new HashMap<>();
+                ADDRtoINFO = new HashMap<>();
 
-                Map<String, String> groupcache = new HashMap<String, String>();
+                Map<String, String> groupcache = new HashMap<>();
                 memberlist.removeAll();
                 groups.removeAll();
                 groups.addItem(rb.getString("allName"));
 
                 Iterator<CommunicationEvent> members = ipmsg.getUsers().values().iterator();
-                SortedSet<CommunicationEvent> tmpvec = new TreeSet<CommunicationEvent>();
+                SortedSet<CommunicationEvent> tmpvec = new TreeSet<>();
                 while (members.hasNext()) {
                     CommunicationEvent tmpevent = members.next();
                     tmpvec.add(tmpevent);
@@ -361,8 +362,8 @@ public class MainWindow extends JFrame {
                     }
 
                     String tmpstr = ipmsg.makeListString(tmppack);
-                    ListModel listModel = memberlist.getModel();
-                    DefaultListModel newListModel = new DefaultListModel();
+                    ListModel<String> listModel = memberlist.getModel();
+                    DefaultListModel<String> newListModel = new DefaultListModel<>();
                     for (int i = 0; i < listModel.getSize(); i++) {
                         newListModel.addElement(listModel.getElementAt(i));
                     }

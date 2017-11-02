@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="Shift_JIS"?>
+<?xml version="1.0" encoding="utf-8"?>
 
 <!-- ////////////////////////////////////////////////////////////////////// -->
 <!-- Copyright (c) 2003 by Naohide Sano, All rights reserved.               -->
@@ -15,12 +15,14 @@
 <project name="vavi-ipmsg" default="run" basedir="."
          xmlns:ivy="antlib:org.apache.ivy.ant">
 
-  <!-- ƒvƒƒpƒeƒB‚Ì’è‹` -->
+  <!-- ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã®å®šç¾© -->
 
+  <property environment="env"/>
   <property file="local.properties" />
+
   <property name="dir.build" value="target/classes" />
 
-  <!-- ƒNƒ‰ƒXƒpƒX‚Ì’è‹` -->
+  <!-- ã‚¯ãƒ©ã‚¹ãƒ‘ã‚¹ã®å®šç¾© -->
   <path id="project.class.path">
     <pathelement location="${dir.build}" />
     <fileset dir="lib">
@@ -28,15 +30,15 @@
     </fileset>
   </path>
 
-  <!-- ƒ^[ƒQƒbƒg‚Ì’è‹` -->
+  <!-- ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®å®šç¾© -->
 
   <!-- clean -->
-  <target name="clean" description="ƒrƒ‹ƒhŠÂ‹«‚ÌƒNƒŠƒA">
+  <target name="clean" description="ãƒ“ãƒ«ãƒ‰ç’°å¢ƒã®ã‚¯ãƒªã‚¢">
     <delete dir="${dir.build}" />
   </target>
 
   <!-- prepare -->
-  <target name="prepare" description="€”õ">
+  <target name="prepare" description="æº–å‚™">
     <mkdir dir="${dir.build}" />
     <ivy:settings file="ivy-settings.xml" />
     <ivy:convertpom pomFile="pom.xml" ivyFile="ivy.xml" />
@@ -44,7 +46,7 @@
   </target>
 
   <!-- javac -->
-  <target name="compile" depends="prepare" description="ƒRƒ“ƒpƒCƒ‹">
+  <target name="compile" depends="prepare" description="ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«">
     <javac debug="on" destdir="${dir.build}">
       <classpath refid="project.class.path" />
       <include name="**/*.java" />
@@ -72,14 +74,14 @@
   </target>
 
   <!-- jar -->
-  <target name="packaging" depends="dist" description="ƒpƒbƒP[ƒWƒ“ƒO">
+  <target name="packaging" depends="dist" description="ãƒ‘ãƒƒã‚±ãƒ¼ã‚¸ãƒ³ã‚°">
     <jar jarfile="target/vavi-ipmsg.jar">
       <fileset dir="${dir.build}" />
     </jar>
   </target>
 
   <!-- go -->
-  <target name="go" depends="packaging" description="ƒvƒƒOƒ‰ƒ€‚ÌŽÀs">
+  <target name="go" depends="packaging" description="ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®å®Ÿè¡Œ">
     <java classname="vavi.apps.ipm.MainWindow" fork="yes">
       <jvmarg value="-Duser.home=${my.home}" /> 
       <jvmarg value="-Dswing.plaf.metal.controlFont=Dialog-12" />
@@ -91,7 +93,7 @@
   </target>
 
   <!-- run -->
-  <target name="run" depends="dist" description="ƒvƒƒOƒ‰ƒ€‚ÌŽÀs">
+  <target name="run" depends="dist" description="ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®å®Ÿè¡Œ">
     <java classname="vavi.apps.ipm.MainWindow" fork="yes">
       <jvmarg value="-Duser.home=${my.home}" /> 
       <jvmarg value="-Dswing.plaf.metal.controlFont=Dialog-12" />

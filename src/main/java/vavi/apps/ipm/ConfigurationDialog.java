@@ -49,7 +49,7 @@ import vavi.net.im.protocol.ipm.event.CommunicationEvent;
 public class ConfigurationDialog extends JDialog {
     Ipmessenger ipmsg;
 
-    /** ê›íËÉtÉ@ÉCÉã */
+    /** Ë®≠ÂÆö„Éï„Ç°„Ç§„É´ */
     private static Preferences userPrefs = Preferences.userNodeForPackage(Ipmessenger.class);
 
     /** */
@@ -111,8 +111,8 @@ public class ConfigurationDialog extends JDialog {
         gridBagLayout.setConstraints(textField2, gbc);
         add(textField2);
 
-        final JComboBox choice1 = new JComboBox();
-        Map<String, String> groupcache = new HashMap<String, String>();
+        final JComboBox<String> choice1 = new JComboBox<>();
+        Map<String, String> groupcache = new HashMap<>();
         Iterator<CommunicationEvent> members = ipmsg.getUsers().values().iterator();
         while (members.hasNext()) {
             CommunicationEvent tmpevent = members.next();
@@ -178,11 +178,11 @@ public class ConfigurationDialog extends JDialog {
         gridBagLayout.setConstraints(textField4, gbc);
         add(textField4);
 
-        final JList list1 = new JList();
+        final JList<String> list1 = new JList<>();
         list1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         StringTokenizer st1 = new StringTokenizer(userPrefs.get("broadcastAddr", rrb.getString("broadcastAddr")), ",");
         while (st1.hasMoreTokens()) {
-            ((DefaultListModel) list1.getModel()).addElement(st1.nextToken());
+            ((DefaultListModel<String>) list1.getModel()).addElement(st1.nextToken());
         }
         gbc = new GridBagConstraints();
         gbc.gridx = 2;
@@ -199,8 +199,8 @@ public class ConfigurationDialog extends JDialog {
         button1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 if (!textField4.getText().equals("")) {
-                    ListModel listModel = list1.getModel();
-                    DefaultListModel newListModel = new DefaultListModel();
+                    ListModel<String> listModel = list1.getModel();
+                    DefaultListModel<String> newListModel = new DefaultListModel<>();
                     for (int i = 0; i < listModel.getSize(); i++) {
                         newListModel.addElement(listModel.getElementAt(i));
                     }
@@ -225,7 +225,7 @@ public class ConfigurationDialog extends JDialog {
         button2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 if (list1.getSelectedValue() != null) {
-                    textField4.setText((String) list1.getSelectedValue());
+                    textField4.setText(list1.getSelectedValue());
                     list1.remove(list1.getSelectedIndex());
                 }
             }

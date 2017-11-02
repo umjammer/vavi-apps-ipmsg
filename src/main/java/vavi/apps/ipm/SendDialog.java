@@ -49,7 +49,7 @@ public class SendDialog extends JDialog {
 
     private JCheckBox passwd;
 
-    /** ê›íËÉtÉ@ÉCÉã */
+    /** Ë®≠ÂÆö„Éï„Ç°„Ç§„É´ */
     private static Preferences userPrefs = Preferences.userNodeForPackage(Ipmessenger.class);
 
     /** */
@@ -87,7 +87,7 @@ public class SendDialog extends JDialog {
             JLabel to = new JLabel(rb.getString("toMulticastLabel"));
             p1.add(to);
 
-            JComboBox choice = new JComboBox();
+            JComboBox<String> choice = new JComboBox<>();
             for (int i = 0; i < users.length; i++) {
                 choice.addItem(ipmsg.makeListString(users[i].getPacket()));
             }
