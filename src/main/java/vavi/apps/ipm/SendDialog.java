@@ -39,6 +39,7 @@ import vavi.net.im.protocol.ipm.event.CommunicationEvent;
  * IP Messenger Send Dialog Class
  */
 public class SendDialog extends JDialog {
+
     private Ipmessenger ipmsg;
 
     private CommunicationEvent[] users;
@@ -62,7 +63,7 @@ public class SendDialog extends JDialog {
         createWindow(p);
     }
 
-    private void createWindow(final JFrame p) {
+    private void createWindow(JFrame p) {
         setVisible(false);
         setTitle(rb.getString("senddlgName"));
         addWindowListener(new WindowAdapter() {
@@ -88,8 +89,8 @@ public class SendDialog extends JDialog {
             p1.add(to);
 
             JComboBox<String> choice = new JComboBox<>();
-            for (int i = 0; i < users.length; i++) {
-                choice.addItem(ipmsg.makeListString(users[i].getPacket()));
+            for (CommunicationEvent user : users) {
+                choice.addItem(ipmsg.makeListString(user.getPacket()));
             }
             p1.add(choice);
         }
@@ -100,54 +101,50 @@ public class SendDialog extends JDialog {
         add("South", p2);
 
         JButton send = new JButton(rb.getString("sendLabel"));
-        send.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                try {
-                    exitAction();
+        send.addActionListener(ae -> {
+            try {
+                exitAction();
 
-                    long flag = 0;
-                    String suffix = "";
-                    if (secret.isSelected()) {
-                        flag |= Constant.SECRETOPT.getValue();;
-                        suffix = "(" + userPrefs.get("secretLogFlag", rb.getString("secretLogFlag")) + ")";
-                    }
-                    if (passwd.isSelected()) {
-                        flag |= Constant.PASSWORDOPT.getValue();
-                        suffix = "(" + userPrefs.get("passwdLogFlag", rb.getString("passwdLogFlag")) + ")";
-                    }
-
-                    InetSocketAddress[] tmpaddrs = null;
-                    String tostr;
-                    if (users != null) {
-                        tmpaddrs = new InetSocketAddress[users.length];
-                        tmpaddrs[0] = users[0].getAddress();
-                        tostr = "To: " + ipmsg.makeListString(users[0].getPacket());
-                        for (int i = 1; i < users.length; i++) {
-                            suffix = "(" + userPrefs.get("multicastLogFlag", rb.getString("multicastLogFlag")) + ") " + suffix;
-                            tmpaddrs[i] = users[i].getAddress();
-                            tostr = System.getProperty("line.separator", "\n") + "To: " + ipmsg.makeListString(users[i].getPacket());
-                        }
-                    } else {
-                        tostr = "To: BROADCAST";
-                        suffix = "(" + userPrefs.get("broadcastLogFlag", rb.getString("broadcastLogFlag")) + ") " + suffix;
-                    }
-                    ipmsg.sendMessage(tmpaddrs, body.getText(), flag);
-                    ipmsg.writeLog(tostr, ipmsg.makeDateString(new Date(System.currentTimeMillis())) + " " + suffix, body.getText());
-                } catch (IOException e) {
-                    e.printStackTrace(); // TODO
+                long flag = 0;
+                String suffix = "";
+                if (secret.isSelected()) {
+                    flag |= Constant.SECRETOPT.getValue();
+                    suffix = "(" + userPrefs.get("secretLogFlag", rb.getString("secretLogFlag")) + ")";
                 }
+                if (passwd.isSelected()) {
+                    flag |= Constant.PASSWORDOPT.getValue();
+                    suffix = "(" + userPrefs.get("passwdLogFlag", rb.getString("passwdLogFlag")) + ")";
+                }
+
+                InetSocketAddress[] tmpaddrs = null;
+                String tostr;
+                if (users != null) {
+                    tmpaddrs = new InetSocketAddress[users.length];
+                    tmpaddrs[0] = users[0].getAddress();
+                    tostr = "To: " + ipmsg.makeListString(users[0].getPacket());
+                    for (int i = 1; i < users.length; i++) {
+                        suffix = "(" + userPrefs.get("multicastLogFlag", rb.getString("multicastLogFlag")) + ") " + suffix;
+                        tmpaddrs[i] = users[i].getAddress();
+                        tostr = System.getProperty("line.separator", "\n") + "To: " + ipmsg.makeListString(users[i].getPacket());
+                    }
+                } else {
+                    tostr = "To: BROADCAST";
+                    suffix = "(" + userPrefs.get("broadcastLogFlag", rb.getString("broadcastLogFlag")) + ") " + suffix;
+                }
+                ipmsg.sendMessage(tmpaddrs, body.getText(), flag);
+                ipmsg.writeLog(tostr, ipmsg.makeDateString(new Date(System.currentTimeMillis())) + " " + suffix, body.getText());
+            } catch (IOException e) {
+                e.printStackTrace(); // TODO
             }
         });
         p2.add(send);
         secret = new JCheckBox(rb.getString("secretLabel"));
-        secret.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent ie) {
-                if (secret.isSelected()) {
-                    passwd.setEnabled(true);
-                } else {
-                    passwd.setSelected(false);
-                    passwd.setEnabled(false);
-                }
+        secret.addItemListener(ie -> {
+            if (secret.isSelected()) {
+                passwd.setEnabled(true);
+            } else {
+                passwd.setSelected(false);
+                passwd.setEnabled(false);
             }
         });
         secret.setSelected(userPrefs.getBoolean("secretState", Boolean.parseBoolean(rb.getString("secretState"))));
@@ -158,11 +155,7 @@ public class SendDialog extends JDialog {
         p2.add(passwd);
 
         JButton cancel = new JButton(rb.getString("cancelLabel"));
-        cancel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                exitAction();
-            }
-        });
+        cancel.addActionListener(ae -> exitAction());
         p2.add(cancel);
         try {
             int x = userPrefs.getInt("dlgSizeX", Integer.parseInt(rb.getString("dlgSizeX")));

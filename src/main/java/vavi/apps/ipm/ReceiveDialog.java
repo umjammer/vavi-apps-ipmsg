@@ -36,6 +36,7 @@ import vavi.net.im.protocol.ipm.event.IpmEvent;
  * IP Messenger Recv Dialog Class
  */
 public class ReceiveDialog extends JDialog {
+
     private Ipmessenger ipmsg;
 
     private IpmEvent ipme;
@@ -45,9 +46,7 @@ public class ReceiveDialog extends JDialog {
     private String suffix = "";
 
     private JLabel user;
-
     private JTextField body;
-
     private JCheckBox quote;
 
     /** 設定ファイル */
@@ -64,7 +63,7 @@ public class ReceiveDialog extends JDialog {
         createWindow(p);
     }
 
-    private void createWindow(final JFrame p) {
+    private void createWindow(JFrame p) {
         setVisible(false);
         setTitle(rb.getString("recvdlgName"));
         addWindowListener(new WindowAdapter() {
@@ -102,28 +101,26 @@ public class ReceiveDialog extends JDialog {
         JPanel p3 = new JPanel(new FlowLayout(FlowLayout.CENTER));
         p2.add("South", p3);
 
-        final JButton reply = new JButton(rb.getString("replyLabel"));
-        reply.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                CommunicationEvent[] tmpipmce = new CommunicationEvent[1];
-                if (ipmce != null) {
-                    tmpipmce[0] = ipmce;
-                } else {
-                    tmpipmce[0] = ipme;
-                    tmpipmce[0].getPacket().setExtra(null);
-                }
-
-                SendDialog sd = new SendDialog(p, ipmsg, tmpipmce);
-                if (quote.isSelected()) {
-                    // String cr = (String)
-                    // System.getProperty("line.separator");
-                    String cr = "\n";
-                    String tmpstr = rb.getString("quoter") + body.getText();
-                    tmpstr = tmpstr.replace(cr, cr + "> ");
-                    sd.setText(tmpstr);
-                }
-                sd.setVisible(true);
+        JButton reply = new JButton(rb.getString("replyLabel"));
+        reply.addActionListener(ae -> {
+            CommunicationEvent[] tmpipmce = new CommunicationEvent[1];
+            if (ipmce != null) {
+                tmpipmce[0] = ipmce;
+            } else {
+                tmpipmce[0] = ipme;
+                tmpipmce[0].getPacket().setExtra(null);
             }
+
+            SendDialog sd = new SendDialog(p, ipmsg, tmpipmce);
+            if (quote.isSelected()) {
+                // String cr = (String)
+                // System.getProperty("line.separator");
+                String cr = "\n";
+                String tmpstr = rb.getString("quoter") + body.getText();
+                tmpstr = tmpstr.replace(cr, cr + "> ");
+                sd.setText(tmpstr);
+            }
+            sd.setVisible(true);
         });
         p3.add(reply);
         quote = new JCheckBox(rb.getString("quoteLabel"));
@@ -131,11 +128,7 @@ public class ReceiveDialog extends JDialog {
         p3.add(quote);
 
         JButton close = new JButton(rb.getString("closeLabel"));
-        close.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                exitAction();
-            }
-        });
+        close.addActionListener(ae -> exitAction());
         p3.add(close);
         try {
             int x = userPrefs.getInt("dlgSizeX", Integer.parseInt(rb.getString("dlgSizeX")));
@@ -156,35 +149,33 @@ public class ReceiveDialog extends JDialog {
         }
         if ((ipme.getPacket().getCommand() & Constant.PASSWORDOPT.getValue()) != 0) {
             suffix = suffix + " (" + userPrefs.get("passwdLogFlag", rb.getString("passwdLogFlag")) + ")";
-            final String strpass = userPrefs.get("password", rb.getString("password"));
-            final JPanel p4 = new JPanel(new FlowLayout());
+            String strpass = userPrefs.get("password", rb.getString("password"));
+            JPanel p4 = new JPanel(new FlowLayout());
             add("Center", p4);
 
             JLabel passwdlabel = new JLabel(rb.getString("inputPasswdLabel"));
             p4.add(passwdlabel);
 
-            final JPasswordField input = new JPasswordField(20);
+            JPasswordField input = new JPasswordField(20);
             input.setEchoChar('*');
             p4.add(input);
 
             JButton open = new JButton(rb.getString("openLabel"));
-            open.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    try {
-                        if (strpass.equals(MessageDigester.getMD5(new String(input.getPassword())).getBytes("MS932"))) {
-                            ipmsg.sendReadMessage(ipme);
-                            remove(p4);
-                            add("Center", body);
-                            reply.setEnabled(true);
-                            quote.setEnabled(true);
-                            validate();
-                            ipmsg.writeLog("From: " + user.getText(), ipmsg.makeDateString(ipme.getDate()) + suffix, ipme.getPacket().getExtra());
-                        } else {
-                            getToolkit().beep();
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace(); // TODO
+            open.addActionListener(ae -> {
+                try {
+                    if (strpass.equals(MessageDigester.getMD5(new String(input.getPassword())).getBytes("MS932"))) {
+                        ipmsg.sendReadMessage(ipme);
+                        remove(p4);
+                        add("Center", body);
+                        reply.setEnabled(true);
+                        quote.setEnabled(true);
+                        validate();
+                        ipmsg.writeLog("From: " + user.getText(), ipmsg.makeDateString(ipme.getDate()) + suffix, ipme.getPacket().getExtra());
+                    } else {
+                        getToolkit().beep();
                     }
+                } catch (IOException e) {
+                    e.printStackTrace(); // TODO
                 }
             });
             p4.add(open);
@@ -195,20 +186,18 @@ public class ReceiveDialog extends JDialog {
         if ((ipme.getPacket().getCommand() & Constant.SECRETOPT.getValue()) != 0) {
             suffix = suffix + " (" + userPrefs.get("secretLogFlag", rb.getString("secretLogFlag")) + ")";
 
-            final JButton open = new JButton(rb.getString("openLabel"));
-            open.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    try {
-                        ipmsg.sendReadMessage(ipme);
-                        remove(open);
-                        add("Center", body);
-                        reply.setEnabled(true);
-                        quote.setEnabled(true);
-                        validate();
-                        ipmsg.writeLog("From: " + user.getText(), ipmsg.makeDateString(ipme.getDate()) + suffix, ipme.getPacket().getExtra());
-                    } catch (IOException e) {
-                        e.printStackTrace(); // TODO
-                    }
+            JButton open = new JButton(rb.getString("openLabel"));
+            open.addActionListener(ae -> {
+                try {
+                    ipmsg.sendReadMessage(ipme);
+                    remove(open);
+                    add("Center", body);
+                    reply.setEnabled(true);
+                    quote.setEnabled(true);
+                    validate();
+                    ipmsg.writeLog("From: " + user.getText(), ipmsg.makeDateString(ipme.getDate()) + suffix, ipme.getPacket().getExtra());
+                } catch (IOException e) {
+                    e.printStackTrace(); // TODO
                 }
             });
             add("Center", open);

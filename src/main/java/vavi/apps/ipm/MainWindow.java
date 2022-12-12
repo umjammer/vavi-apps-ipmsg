@@ -53,30 +53,23 @@ import vavi.net.im.protocol.ipm.event.IpmListener;
  * @version 0.00 2005/08/02 nsano initial version <br>
  */
 public class MainWindow extends JFrame {
+
     public Ipmessenger ipmsg;
 
     private JButton send;
-
     private JButton refresh;
-
     private JButton conf;
-
     private JButton exit;
 
     private JList<String> memberlist;
-
     private JCheckBox absence;
-
     private JCheckBox broadcast;
-
     private JComboBox<String> groups;
 
     private Map<String, CommunicationEvent> NAMEtoINFO = new HashMap<>();
-
     private Map<String, CommunicationEvent> ADDRtoINFO = new HashMap<>();
 
     private boolean refreshing = false;
-
     private boolean received = false;
 
     /** 設定ファイル */
@@ -115,35 +108,19 @@ public class MainWindow extends JFrame {
         add("North", p1);
         send = new JButton();
         send.setText(rb.getString("sendLabel"));
-        send.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                sendAction();
-            }
-        });
+        send.addActionListener(ae -> sendAction());
         p1.add(send);
         refresh = new JButton();
         refresh.setText(rb.getString("refreshLabel"));
-        refresh.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                refreshAction();
-            }
-        });
+        refresh.addActionListener(ae -> refreshAction());
         p1.add(refresh);
         conf = new JButton();
         conf.setText(rb.getString("configLabel"));
-        conf.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                confAction();
-            }
-        });
+        conf.addActionListener(ae -> confAction());
         p1.add(conf);
         exit = new JButton();
         exit.setText(rb.getString("exitLabel"));
-        exit.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                exitAction();
-            }
-        });
+        exit.addActionListener(ae -> exitAction());
         p1.add(exit);
 
         JPanel p5 = new JPanel(new BorderLayout());
@@ -153,34 +130,18 @@ public class MainWindow extends JFrame {
         p5.add("North", p6);
 
         JButton sortuser = new JButton(rb.getString("sortUserLabel"));
-        sortuser.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                sortKeyChanged("u");
-            }
-        });
+        sortuser.addActionListener(ae -> sortKeyChanged("u"));
         p6.add(sortuser);
 
         JButton sortgroup = new JButton(rb.getString("sortGroupLabel"));
-        sortgroup.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                sortKeyChanged("g");
-            }
-        });
+        sortgroup.addActionListener(ae -> sortKeyChanged("g"));
         p6.add(sortgroup);
 
         JButton sorthost = new JButton(rb.getString("sortHostLabel"));
-        sorthost.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                sortKeyChanged("h");
-            }
-        });
+        sorthost.addActionListener(ae -> sortKeyChanged("h"));
         p6.add(sorthost);
         memberlist = new JList<>();
-        memberlist.addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent event) {
-                sendAction();
-            }
-        });
+        memberlist.addListSelectionListener(event -> sendAction());
         p5.add("Center", memberlist);
 
         JPanel p2 = new JPanel(new BorderLayout(5, 5));
@@ -189,21 +150,15 @@ public class MainWindow extends JFrame {
         JPanel p3 = new JPanel(new FlowLayout(FlowLayout.CENTER, 3, 3));
         p2.add("West", p3);
         broadcast = new JCheckBox(rb.getString("broadcastLabel"));
-        broadcast.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent ie) {
-                memberlist.setEnabled(!broadcast.isSelected());
-            }
-        });
+        broadcast.addItemListener(ie -> memberlist.setEnabled(!broadcast.isSelected()));
         p3.add(broadcast);
         groups = new JComboBox<>();
         groups.addItem(rb.getString("allName"));
-        groups.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent ie) {
-                received = true;
-                if (!refreshing) {
-                    refreshing = true;
-                    new RefreshList().start();
-                }
+        groups.addItemListener(ie -> {
+            received = true;
+            if (!refreshing) {
+                refreshing = true;
+                new RefreshList().start();
             }
         });
         p2.add("Center", groups);
@@ -211,12 +166,10 @@ public class MainWindow extends JFrame {
         JPanel p4 = new JPanel(new FlowLayout(FlowLayout.CENTER, 3, 3));
         p2.add("East", p4);
         absence = new JCheckBox(rb.getString("absenceLabel"));
-        absence.setSelected(new Boolean(rb.getString("absenceState")).booleanValue());
-        absence.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent ie) {
-                userPrefs.put("absenceState", new Boolean(absence.isSelected()).toString());
-                ipmsg.absenceStateChanged();
-            }
+        absence.setSelected(Boolean.valueOf(rb.getString("absenceState")));
+        absence.addItemListener(ie -> {
+            userPrefs.put("absenceState", new Boolean(absence.isSelected()).toString());
+            ipmsg.absenceStateChanged();
         });
         p4.add(absence);
         int w = userPrefs.getInt("mainSizeX", Integer.parseInt(rrb.getString("mainSizeX")));
@@ -234,7 +187,7 @@ public class MainWindow extends JFrame {
         /** */
         private String getKey(CommunicationEvent ipmce) {
             String tmpkey = rb.getString("sortKey");
-            StringBuffer strbuf = new StringBuffer();
+            StringBuilder strbuf = new StringBuilder();
             for (int i = 0; i < tmpkey.length(); i++) {
                 switch (tmpkey.charAt(i)) {
                 case 'u':
@@ -418,10 +371,10 @@ public class MainWindow extends JFrame {
                 }
     
                 StringBuilder strbuf = new StringBuilder();
-                strbuf.append(rb.getString("readMsg") + "\n");
+                strbuf.append(rb.getString("readMsg")).append("\n");
                 strbuf.append(ipmsg.makeDateString(ipme.getDate()));
     
-                JOptionPane.showMessageDialog(MainWindow.this, tmpname, new String(strbuf), 0);
+                JOptionPane.showMessageDialog(MainWindow.this, tmpname, new String(strbuf), JOptionPane.ERROR_MESSAGE);
                 break;
             case DELETE_MESSAGE:
                 getToolkit().beep();
@@ -434,7 +387,7 @@ public class MainWindow extends JFrame {
                     tmpname = ipme.getPacket().getUser();
                 }
                 strbuf = new StringBuilder();
-                strbuf.append(rb.getString("deleteMsg") + "\n");
+                strbuf.append(rb.getString("deleteMsg")).append("\n");
                 strbuf.append(ipmsg.makeDateString(ipme.getDate()));
                 JOptionPane.showMessageDialog(MainWindow.this, strbuf, tmpname, JOptionPane.INFORMATION_MESSAGE);
                 break;

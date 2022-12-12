@@ -11,20 +11,14 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 import java.util.prefs.Preferences;
-
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -47,6 +41,7 @@ import vavi.net.im.protocol.ipm.event.CommunicationEvent;
  * IP Messenger Config Dialog
  */
 public class ConfigurationDialog extends JDialog {
+
     Ipmessenger ipmsg;
 
     /** 設定ファイル */
@@ -64,7 +59,7 @@ public class ConfigurationDialog extends JDialog {
         createWindow(parent);
     }
 
-    private void createWindow(final JFrame parent) {
+    private void createWindow(JFrame parent) {
         GridBagLayout gridBagLayout = new GridBagLayout();
         setLayout(gridBagLayout);
 
@@ -78,7 +73,7 @@ public class ConfigurationDialog extends JDialog {
         gridBagLayout.setConstraints(label1, gbc);
         add(label1);
 
-        final JTextField textField1 = new JTextField();
+        JTextField textField1 = new JTextField();
         textField1.setText(userPrefs.get("nickName", rb.getString("nickName")));
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
@@ -100,7 +95,7 @@ public class ConfigurationDialog extends JDialog {
         gridBagLayout.setConstraints(label2, gbc);
         add(label2);
 
-        final JTextField textField2 = new JTextField(12);
+        JTextField textField2 = new JTextField(12);
         textField2.setText(userPrefs.get("groupName", rb.getString("groupName")));
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
@@ -111,22 +106,16 @@ public class ConfigurationDialog extends JDialog {
         gridBagLayout.setConstraints(textField2, gbc);
         add(textField2);
 
-        final JComboBox<String> choice1 = new JComboBox<>();
+        JComboBox<String> choice1 = new JComboBox<>();
         Map<String, String> groupcache = new HashMap<>();
-        Iterator<CommunicationEvent> members = ipmsg.getUsers().values().iterator();
-        while (members.hasNext()) {
-            CommunicationEvent tmpevent = members.next();
+        for (CommunicationEvent tmpevent : ipmsg.getUsers().values()) {
             IpmPacket tmppack = tmpevent.getPacket();
             if ((tmppack.getGroup() != null) && (groupcache.get(tmppack.getGroup()) == null)) {
                 choice1.addItem(tmppack.getGroup());
                 groupcache.put(tmppack.getGroup(), tmppack.getGroup());
             }
         }
-        choice1.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent ie) {
-                textField2.setText((String) choice1.getSelectedItem());
-            }
-        });
+        choice1.addItemListener(ie -> textField2.setText((String) choice1.getSelectedItem()));
         gbc = new GridBagConstraints();
         gbc.gridx = 2;
         gbc.gridy = 1;
@@ -146,7 +135,7 @@ public class ConfigurationDialog extends JDialog {
         gridBagLayout.setConstraints(label3, gbc);
         add(label3);
 
-        final JTextField textField3 = new JTextField();
+        JTextField textField3 = new JTextField();
         textField3.setText(userPrefs.get("absenceMsg", rrb.getString("absenceMsg")));
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
@@ -168,7 +157,7 @@ public class ConfigurationDialog extends JDialog {
         gridBagLayout.setConstraints(label4, gbc);
         add(label4);
 
-        final JTextField textField4 = new JTextField();
+        JTextField textField4 = new JTextField();
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
         gbc.gridy = 3;
@@ -178,7 +167,7 @@ public class ConfigurationDialog extends JDialog {
         gridBagLayout.setConstraints(textField4, gbc);
         add(textField4);
 
-        final JList<String> list1 = new JList<>();
+        JList<String> list1 = new JList<>();
         list1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         StringTokenizer st1 = new StringTokenizer(userPrefs.get("broadcastAddr", rrb.getString("broadcastAddr")), ",");
         while (st1.hasMoreTokens()) {
@@ -196,18 +185,16 @@ public class ConfigurationDialog extends JDialog {
 
         JButton button1 = new JButton();
         button1.setText(rb.getString("addbuttonLabel"));
-        button1.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                if (!textField4.getText().equals("")) {
-                    ListModel<String> listModel = list1.getModel();
-                    DefaultListModel<String> newListModel = new DefaultListModel<>();
-                    for (int i = 0; i < listModel.getSize(); i++) {
-                        newListModel.addElement(listModel.getElementAt(i));
-                    }
-                    newListModel.addElement(textField4.getText());
-                    list1.setModel(newListModel);
-                    textField4.setText("");
+        button1.addActionListener(ae -> {
+            if (!textField4.getText().equals("")) {
+                ListModel<String> listModel = list1.getModel();
+                DefaultListModel<String> newListModel = new DefaultListModel<>();
+                for (int i = 0; i < listModel.getSize(); i++) {
+                    newListModel.addElement(listModel.getElementAt(i));
                 }
+                newListModel.addElement(textField4.getText());
+                list1.setModel(newListModel);
+                textField4.setText("");
             }
         });
         gbc = new GridBagConstraints();
@@ -222,12 +209,10 @@ public class ConfigurationDialog extends JDialog {
 
         JButton button2 = new JButton();
         button2.setText(rb.getString("removebuttonLabel"));
-        button2.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                if (list1.getSelectedValue() != null) {
-                    textField4.setText(list1.getSelectedValue());
-                    list1.remove(list1.getSelectedIndex());
-                }
+        button2.addActionListener(ae -> {
+            if (list1.getSelectedValue() != null) {
+                textField4.setText(list1.getSelectedValue());
+                list1.remove(list1.getSelectedIndex());
             }
         });
         gbc = new GridBagConstraints();
@@ -261,15 +246,15 @@ public class ConfigurationDialog extends JDialog {
         gridBagLayout.setConstraints(panel1, gbc);
         add(panel1);
 
-        final JPasswordField textField5 = new JPasswordField();
+        JPasswordField textField5 = new JPasswordField();
         textField5.setEchoChar('*');
         panel1.add(textField5);
 
-        final JPasswordField textField6 = new JPasswordField();
+        JPasswordField textField6 = new JPasswordField();
         textField6.setEchoChar('*');
         panel1.add(textField6);
 
-        final JPasswordField textField7 = new JPasswordField();
+        JPasswordField textField7 = new JPasswordField();
         textField7.setEchoChar('*');
         panel1.add(textField7);
 
@@ -283,7 +268,7 @@ public class ConfigurationDialog extends JDialog {
         gridBagLayout.setConstraints(label6, gbc);
         add(label6);
 
-        final JTextField textField8 = new JTextField();
+        JTextField textField8 = new JTextField();
         textField8.setText(userPrefs.get("logFilename", rrb.getString("logFilename")));
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
@@ -297,13 +282,11 @@ public class ConfigurationDialog extends JDialog {
 
         JButton bbutton = new JButton();
         bbutton.setText(rb.getString("browseLabel"));
-        bbutton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                FileDialog fd = new FileDialog(parent);
-                fd.setVisible(true);
-                if (fd.getFile() != null) {
-                    textField8.setText(fd.getDirectory() + fd.getFile());
-                }
+        bbutton.addActionListener(ae -> {
+            FileDialog fd = new FileDialog(parent);
+            fd.setVisible(true);
+            if (fd.getFile() != null) {
+                textField8.setText(fd.getDirectory() + fd.getFile());
             }
         });
         gbc = new GridBagConstraints();
@@ -330,69 +313,63 @@ public class ConfigurationDialog extends JDialog {
 
         JButton button3 = new JButton();
         button3.setText(rb.getString("okLabel"));
-        button3.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                if (!textField1.getText().equals("")) {
-                    userPrefs.put("nickName", textField1.getText());
-                } else {
-                    userPrefs.put("nickName", "");
+        button3.addActionListener(ae -> {
+            if (!textField1.getText().equals("")) {
+                userPrefs.put("nickName", textField1.getText());
+            } else {
+                userPrefs.put("nickName", "");
+            }
+            if (!textField2.getText().equals("")) {
+                userPrefs.put("groupName", textField2.getText());
+            } else {
+                userPrefs.put("groupName", "");
+            }
+            if (!textField3.getText().equals("")) {
+                userPrefs.put("absenceMsg", textField3.getText());
+            } else {
+                userPrefs.put("absenceMsg", "");
+            }
+            if (list1.getModel().getSize() != 0) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(list1.getModel().getElementAt(0));
+                for (int i = 1; i < list1.getModel().getSize(); i++) {
+                    sb.append(",").append(list1.getModel().getElementAt(i));
                 }
-                if (!textField2.getText().equals("")) {
-                    userPrefs.put("groupName", textField2.getText());
-                } else {
-                    userPrefs.put("groupName", "");
-                }
-                if (!textField3.getText().equals("")) {
-                    userPrefs.put("absenceMsg", textField3.getText());
-                } else {
-                    userPrefs.put("absenceMsg", "");
-                }
-                if (list1.getModel().getSize() != 0) {
-                    StringBuffer strbuf = new StringBuffer();
-                    strbuf.append(list1.getModel().getElementAt(0));
-                    for (int i = 1; i < list1.getModel().getSize(); i++) {
-                        strbuf.append("," + list1.getModel().getElementAt(i));
-                    }
-                    userPrefs.put("broadcastAddr", new String(strbuf));
-                } else {
-                    userPrefs.put("broadcastAddr", "");
-                }
-                try {
-                    String tmppass = userPrefs.get("password", rrb.getString("password"));
-                    if (textField5.getPassword() != null) {
-                        if (MessageDigester.getMD5(new String(textField5.getPassword())).equals(tmppass)) {
-                            if ((textField6.getPassword() != null) && (textField7.getPassword() != null)) {
-                                if (new String(textField6.getPassword()).equals(new String(textField7.getPassword()))) {
-                                    userPrefs.put("password", MessageDigester.getMD5(new String(textField6.getPassword())));
-                                }
+                userPrefs.put("broadcastAddr", new String(sb));
+            } else {
+                userPrefs.put("broadcastAddr", "");
+            }
+            try {
+                String tmppass = userPrefs.get("password", rrb.getString("password"));
+                if (textField5.getPassword() != null) {
+                    if (MessageDigester.getMD5(new String(textField5.getPassword())).equals(tmppass)) {
+                        if ((textField6.getPassword() != null) && (textField7.getPassword() != null)) {
+                            if (new String(textField6.getPassword()).equals(new String(textField7.getPassword()))) {
+                                userPrefs.put("password", MessageDigester.getMD5(new String(textField6.getPassword())));
                             }
                         }
                     }
-                } catch (MissingResourceException ex) {
-                    if ((textField6.getPassword() != null) && (textField7.getPassword() != null)) {
-                        if (new String(textField6.getPassword()).equals(new String(textField7.getPassword()))) {
-                            userPrefs.put("password", MessageDigester.getMD5(new String(textField6.getPassword())));
-                        }
+                }
+            } catch (MissingResourceException ex) {
+                if ((textField6.getPassword() != null) && (textField7.getPassword() != null)) {
+                    if (new String(textField6.getPassword()).equals(new String(textField7.getPassword()))) {
+                        userPrefs.put("password", MessageDigester.getMD5(new String(textField6.getPassword())));
                     }
                 }
-                if (!textField8.getText().equals("")) {
-                    userPrefs.put("logFilename", textField8.getText());
-                } else {
-                    userPrefs.put("logFilename", "");
-                }
-                ipmsg.refreshList();
-                dispose();
             }
+            if (!textField8.getText().equals("")) {
+                userPrefs.put("logFilename", textField8.getText());
+            } else {
+                userPrefs.put("logFilename", "");
+            }
+            ipmsg.refreshList();
+            dispose();
         });
         panel2.add(button3);
 
         JButton button4 = new JButton();
         button4.setText(rb.getString("cancelLabel"));
-        button4.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                dispose();
-            }
-        });
+        button4.addActionListener(ae -> dispose());
         panel2.add(button4);
         pack();
         setTitle(rb.getString("confdlgName"));

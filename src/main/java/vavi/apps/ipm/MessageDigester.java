@@ -37,8 +37,8 @@ final class MessageDigester {
         byte[] buf = md.digest(src.getBytes());
 
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < buf.length; i++) {
-            sb.append(Integer.toString(new Byte(buf[i]).intValue(), Character.MAX_RADIX));
+        for (byte b : buf) {
+            sb.append(Integer.toString(new Byte(b).intValue(), Character.MAX_RADIX));
         }
 
         return sb.toString();
